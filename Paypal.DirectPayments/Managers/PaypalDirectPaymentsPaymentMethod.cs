@@ -1,11 +1,11 @@
-﻿using System;
+﻿using PayPal.PayPalAPIInterfaceService;
+using PayPal.PayPalAPIInterfaceService.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using PayPal.PayPalAPIInterfaceService;
-using PayPal.PayPalAPIInterfaceService.Model;
 using VirtoCommerce.Domain.Payment.Model;
 
 namespace Paypal.DirectPayments.Managers
