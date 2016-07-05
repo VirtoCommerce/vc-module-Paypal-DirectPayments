@@ -16,16 +16,9 @@ namespace Paypal.DirectPayments.Managers
         private const string _paypalApiUserNameStoreSetting = "Paypal.DirectPayments.APIUsername";
         private const string _paypalApiPasswordStoreSetting = "Paypal.DirectPayments.APIPassword";
         private const string _paypalApiSignatureStoreSetting = "Paypal.DirectPayments.APISignature";
-        private const string _paypalPaymentRedirectRelativePathStoreSetting = "Paypal.DirectPayments.PaymentRedirectRelativePath";
-        private const string _paypalPaymentActionTypeStoreSetting = "Paypal.ExpressCheckout.PaypalPaymentActionType";
-
-        private const string _paypalModeConfigSettingName = "mode";
-        private const string _paypalUsernameConfigSettingName = "account1.apiUsername";
-        private const string _paypalPasswordConfigSettingName = "account1.apiPassword";
-        private const string _paypalSignatureConfigSettingName = "account1.apiSignature";
 
         public PaypalDirectPaymentsPaymentMethod()
-            : base("Paypal.DirectPayments")
+            : base("Paypal.DirectPayment")
         {
         }
 
@@ -33,8 +26,7 @@ namespace Paypal.DirectPayments.Managers
         {
             get
             {
-                var retVal = GetSetting(_paypalApiModeStoreSetting);
-                return retVal;
+                return GetSetting(_paypalApiModeStoreSetting);
             }
         }
 
@@ -42,8 +34,7 @@ namespace Paypal.DirectPayments.Managers
         {
             get
             {
-                var retVal = GetSetting(_paypalApiUserNameStoreSetting);
-                return retVal;
+                return GetSetting(_paypalApiUserNameStoreSetting);
             }
         }
 
@@ -51,8 +42,7 @@ namespace Paypal.DirectPayments.Managers
         {
             get
             {
-                var retVal = GetSetting(_paypalApiPasswordStoreSetting);
-                return retVal;
+                return GetSetting(_paypalApiPasswordStoreSetting);
             }
         }
 
@@ -60,19 +50,10 @@ namespace Paypal.DirectPayments.Managers
         {
             get
             {
-                var retVal = GetSetting(_paypalApiSignatureStoreSetting);
-                return retVal;
+                return GetSetting(_paypalApiSignatureStoreSetting);
             }
         }
 
-        private string PaypalPaymentRedirectRelativePath
-        {
-            get
-            {
-                var retVal = GetSetting(_paypalPaymentRedirectRelativePathStoreSetting);
-                return retVal;
-            }
-        }
 
         public override PaymentMethodType PaymentMethodType
         {
@@ -94,16 +75,24 @@ namespace Paypal.DirectPayments.Managers
 
             var retVal = new ProcessPaymentResult();
 
-            var doDirectPaymentRequest = GetDoDirectPaymentRequest(context);
-
-            var service = GetService();
-            var response = service.DoDirectPayment(doDirectPaymentRequest);
-
+            DoDirectPaymentResponseType response = null;
             string error;
-            bool success = CheckResponse(response, out error);
+            bool isSuccess = false;
+            var doDirectPaymentRequest = GetDoDirectPaymentRequest(context);
+            try
+            {
+                var service = GetService();
+                response = service.DoDirectPayment(doDirectPaymentRequest);
+
+                isSuccess = CheckResponse(response, out error);
+            }
+            catch (PayPal.Exception.ConnectionException ex)
+            {
+                error = ((PayPal.Exception.ConnectionException)ex.InnerException).Response;
+            }
 
 
-            if (success)
+            if (isSuccess)
             {
                 retVal.OuterId = response.TransactionID;
                 retVal.IsSuccess = (response.Ack.Value == AckCodeType.SUCCESS || response.Ack.Value == AckCodeType.SUCCESSWITHWARNING);
@@ -158,8 +147,7 @@ namespace Paypal.DirectPayments.Managers
             config.Add("account0.apiPassword", APIPassword);
             config.Add("account0.apiSignature", APISignature);
 
-            var service = new PayPalAPIInterfaceServiceService(config);
-            return service;
+            return new PayPalAPIInterfaceServiceService(config);
         }
 
         private DoDirectPaymentReq GetDoDirectPaymentRequest(ProcessPaymentEvaluationContext context)
@@ -194,7 +182,7 @@ namespace Paypal.DirectPayments.Managers
             retVal.CreditCardNumber = context.BankCardInfo.BankCardNumber;
             retVal.CreditCardType = GetPaypalCreditCardType(context.BankCardInfo.BankCardType);
             retVal.ExpMonth = context.BankCardInfo.BankCardMonth;
-            retVal.ExpYear = context.BankCardInfo.BankCardYear;
+            retVal.ExpYear = (context.BankCardInfo.BankCardYear < 100 ? 2000 : 0) + context.BankCardInfo.BankCardYear;
             retVal.CVV2 = context.BankCardInfo.BankCardCVV2;
             retVal.CardOwner = new PayerInfoType();
 
@@ -314,7 +302,7 @@ namespace Paypal.DirectPayments.Managers
 
             if (response != null)
             {
-                if ((response.Errors != null && response.Errors.Count > 0) || !(response.Ack.Equals(AckCodeType.SUCCESS) || response.Ack.Equals(AckCodeType.SUCCESSWITHWARNING)))
+                if ((response.Errors != null && response.Errors.Any()) || !(response.Ack.Equals(AckCodeType.SUCCESS) || response.Ack.Equals(AckCodeType.SUCCESSWITHWARNING)))
                 {
                     StringBuilder sb = new StringBuilder();
                     foreach (var err in response.Errors)
@@ -327,9 +315,8 @@ namespace Paypal.DirectPayments.Managers
                 else
                 {
                     error = string.Empty;
+                    retVal = true;
                 }
-
-                retVal = true;
             }
             else
             {

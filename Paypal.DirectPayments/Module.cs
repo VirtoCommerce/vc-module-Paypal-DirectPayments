@@ -20,17 +20,17 @@ namespace Paypal.DirectPayments
 
         public override void PostInitialize()
         {
-            //var settings = _container.Resolve<ISettingsManager>().GetModuleSettings("Paypal.DirectPayments");
+            var settings = _container.Resolve<ISettingsManager>().GetModuleSettings("Paypal.DirectPayment");
 
-            //Func<PaypalDirectPaymentsPaymentMethod> paypalBankCardsExpressCheckoutPaymentMethodFactory = () => new PaypalDirectPaymentsPaymentMethod
-            //{
-            //	Name = "Credit Card",
-            //	Description = "Paypal direct payment integration",
-            //	LogoUrl = "http://www.credit-card-logos.com/images/multiple_credit-card-logos-2/credit_card_paypal_logos_2.gif",
-            //	Settings = settings
-            //};
+            Func<PaypalDirectPaymentsPaymentMethod> paypalBankCardsExpressCheckoutPaymentMethodFactory = () => new PaypalDirectPaymentsPaymentMethod
+            {
+                Name = "Credit Card (Paypal)",
+                Description = "Paypal Direct Payment",
+                LogoUrl = "https://raw.githubusercontent.com/VirtoCommerce/vc-module-Paypal-DirectPayments/master/Paypal.DirectPayments/Content/paypal_2014_logo.png",
+                Settings = settings
+            };
 
-            //_container.Resolve<IPaymentMethodsService>().RegisterPaymentMethod(paypalBankCardsExpressCheckoutPaymentMethodFactory);
+            _container.Resolve<IPaymentMethodsService>().RegisterPaymentMethod(paypalBankCardsExpressCheckoutPaymentMethodFactory);
         }
 
         #endregion
