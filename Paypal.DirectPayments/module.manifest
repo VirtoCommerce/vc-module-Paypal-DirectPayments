@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <module>
     <id>Paypal.DirectPayment</id>
-    <version>2.11.0</version>
-    <platformVersion>2.11.0</platformVersion>
+    <version>2.12.0</version>
+    <platformVersion>2.12.0</platformVersion>
     <dependencies>
-        <dependency id="VirtoCommerce.Core" version="2.11.0" />
+        <dependency id="VirtoCommerce.Core" version="2.17.0" />
     </dependencies>
 
     <title>Paypal Direct Payment</title>
     <description>Paypal Direct Payment API integration</description>
     <authors>
         <author>Virto Commerce</author>
+        <author>Egidijus Mažeika</author>
     </authors>
     <owners>
         <owner>Virto Commerce</owner>
     </owners>
-    <projectUrl>http://virtocommerce.com/</projectUrl>
+    <projectUrl>https://github.com/VirtoCommerce/vc-module-Paypal-DirectPayments</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/VirtoCommerce/vc-module-Paypal-DirectPayments/master/Paypal.DirectPayments/Content/paypal_2014_logo.png</iconUrl>
     <releaseNotes>First version.</releaseNotes>
     <copyright>Copyright © 2011-2016 Virto Commerce. All rights reserved</copyright>

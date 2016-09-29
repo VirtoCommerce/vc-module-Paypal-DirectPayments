@@ -85,24 +85,37 @@ namespace Paypal.DirectPayments.Managers
                 response = service.DoDirectPayment(doDirectPaymentRequest);
 
                 isSuccess = CheckResponse(response, out error);
+                context.Payment.IsApproved = true;
             }
             catch (PayPal.Exception.ConnectionException ex)
             {
                 error = ((PayPal.Exception.ConnectionException)ex.InnerException).Response;
             }
 
+            PaymentStatus newStatus;
 
             if (isSuccess)
             {
-                retVal.OuterId = response.TransactionID;
+                retVal.OuterId = context.Payment.OuterId = response.TransactionID;
                 retVal.IsSuccess = (response.Ack.Value == AckCodeType.SUCCESS || response.Ack.Value == AckCodeType.SUCCESSWITHWARNING);
-                retVal.NewPaymentStatus = retVal.IsSuccess ? PaymentStatus.Paid : PaymentStatus.Voided;
+                if (retVal.IsSuccess)
+                {
+                    context.Payment.CapturedDate = DateTime.UtcNow;
+                    newStatus = PaymentStatus.Paid;
+                }
+                else
+                {
+                    context.Payment.VoidedDate = DateTime.UtcNow;
+                    newStatus = PaymentStatus.Voided;
+                }
             }
             else
             {
                 retVal.Error = error;
+                newStatus = PaymentStatus.Voided;
             }
 
+            retVal.NewPaymentStatus = context.Payment.PaymentStatus = newStatus;
             return retVal;
         }
 
