@@ -46,13 +46,13 @@
             </setting>
             <setting>
                 <name>Paypal.DirectPayments.APIPassword</name>
-                <valueType>string</valueType>
+                <valueType>securestring</valueType>
                 <title>API password</title>
                 <description>Merchant API password credential</description>
             </setting>
             <setting>
                 <name>Paypal.DirectPayments.APISignature</name>
-                <valueType>string</valueType>
+                <valueType>securestring</valueType>
                 <title>API signature</title>
                 <description>Merchant API signature credential</description>
             </setting>
