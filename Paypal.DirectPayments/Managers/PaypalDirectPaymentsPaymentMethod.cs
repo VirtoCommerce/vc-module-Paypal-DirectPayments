@@ -116,6 +116,8 @@ namespace Paypal.DirectPayments.Managers
             }
 
             retVal.NewPaymentStatus = context.Payment.PaymentStatus = newStatus;
+            context.Payment.Status = newStatus.ToString();
+
             return retVal;
         }
 
